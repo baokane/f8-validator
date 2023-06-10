@@ -184,12 +184,28 @@
 
     <script>
         // mong muốn của chúng ta
+        // Validator({
+        //     form: '#form-1',
+        //     errorSelector: '.form-message',
+        //     rules: [
+        //         Validator.isRequired('#fullname'),
+        //         Validator.isEmail('#email'),
+        //     ]
+        // })
+
+
         Validator({
             form: '#form-1',
             errorSelector: '.form-message',
             rules: [
                 Validator.isRequired('#fullname'),
+                Validator.isRequired('#email'),
                 Validator.isEmail('#email'),
+                Validator.minLength('#password', 6),
+                Validator.isRequired('#password_confirmation'),
+                Validator.isConfirmed('#password_confirmation', function () {
+                    return document.querySelector('#form-1 #password').value
+                }, 'Mật khẩu không chính xác')
             ]
         })
     </script>

@@ -9,9 +9,8 @@ function Validator(option) {
 
         //Lấy ra các rules của selectorRules
         var rules = selectorRules[rule.selector];
-        console.log(rules)
 
-        //Lặp qua các rules và kiểm tra giá trị người dùng nhập vào
+        //Lặp qua các test và kiểm tra giá trị người dùng nhập vào
         //Nếu có lỗi thì dừng việc kiểm tra
         for (var i = 0; i < rules.length; i++) {
             errorMessage = rules[i](inputElement.value);
@@ -25,11 +24,33 @@ function Validator(option) {
             errorElement.innerText = '';
             inputElement.parentElement.classList.remove('invalid')
         }
+        return !errorMessage
     }
 
     var formElement = document.querySelector(option.form)
 
     if (formElement) {
+        //khi submit form
+        formElement.onsubmit = function (e) {
+            e.preventDefault();
+            var isFormValid = true //ko lỗi là true
+            console.log(isFormValid)
+            option.rules.forEach(function (rule) {
+                var inputElement = formElement.querySelector(rule.selector);
+                var isValid = validate(inputElement, rule);
+                if (!isValid) { //có lỗi là false
+                    isFormValid = false  //có lỗi là false
+                }
+            })
+            console.log(isFormValid)
+            if (isFormValid) {
+                console.log('ko lỗi')
+            } else {
+                console.log('có lỗi')
+            }
+
+        }
+
         option.rules.forEach(function (rule) {
             // Lưu lại các rule
             if (Array.isArray(selectorRules[rule.selector])) {
@@ -57,21 +78,21 @@ function Validator(option) {
     }
 }
 
-Validator.isRequired = function (selector) {
+Validator.isRequired = function (selector, message) {
     return {
         selector: selector,
         test: function (value) {
-            return value.trim() ? undefined : 'vui lòng nhập trường này'
+            return value.trim() ? undefined : message || 'vui lòng nhập trường này!!!!!'
         }
     }
 }
 
-Validator.isEmail = function (selector) {
+Validator.isEmail = function (selector, message) {
     return {
         selector: selector,
         test: function (value) {
             var regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
-            return regex.test(value) ? undefined : 'vui lòng nhập email'
+            return regex.test(value) ? undefined : message || 'vui lòng nhập email'
         }
     }
 }
@@ -100,11 +121,21 @@ Validator.isConfirmed = function (selector, getConfirmValue, message) {
 //isrequired , isEmail,// selector, test // formElement, inputElement, errorMessage, errorElement, value: của test
 
 // function Validator(option) {
+//     var selectorRules = {}
+
 //     var formElement = document.querySelector('#form-1')
 //     if (formElement) {
 //         function validate(inputElement, rule) {
-//             var errorMessage = rule.test(inputElement.value);
+//             var errorMessage;
 //             var errorElement = inputElement.parentElement.querySelector(option.errorSelector)
+
+//             var rules = selectorRules[rule.selector];
+//             console.log(rules)
+//             for (var i = 0; i < rules.length; i++) {
+//                 var errorMessage = rules[i](inputElement.value);
+//                 console.log(rules[i])
+//                 if (errorMessage) break;
+//             }
 
 //             if (errorMessage) {
 //                 inputElement.parentElement.classList.add('invalid');
@@ -115,6 +146,14 @@ Validator.isConfirmed = function (selector, getConfirmValue, message) {
 //             }
 //         }
 //         option.rules.forEach(function (rule) {
+//             //Lấy các rule
+//             if (Array.isArray(selectorRules[rule.selector])) {
+//                 selectorRules[rule.selector].push(rule.test)
+//             } else {
+//                 selectorRules[rule.selector] = [rule.test]
+//             }
+
+
 //             let inputElement = formElement.querySelector(rule.selector);
 //             let errorElement = inputElement.parentElement.querySelector(option.errorSelector)
 //             inputElement.onblur = function () {
@@ -126,15 +165,15 @@ Validator.isConfirmed = function (selector, getConfirmValue, message) {
 //                 errorElement.innerText = '';
 //             }
 //         })
-
+//         console.log(selectorRules)
 //     }
 // }
 
-// Validator.isRequired = function (selector) {
+// Validator.isRequired = function (selector, message) {
 //     return {
 //         selector: selector,
 //         test: function (value) {
-//             return value.trim() ? undefined : 'vui lòng nhập name'
+//             return value.trim() ? undefined : message || 'vui lòng nhập trường này'
 //         }
 //     }
 // }
